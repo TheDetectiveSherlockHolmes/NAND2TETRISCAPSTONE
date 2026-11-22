@@ -1,0 +1,75 @@
+
+// KRMU Nand2Tetris Capstone - Hack CPU
+// Based on the official Nand2Tetris Project 5 architecture.
+
+CHIP CPU {
+    IN inM[16], instruction[16], reset;
+    OUT outM[16], writeM, addressM[15], pc[15];
+
+    PARTS:
+
+    // A REGISTER
+    Not(in=instruction[15], out=isAInstruction);
+
+    And(a=instruction[15], b=instruction[5],
+        out=destAFromC);
+
+    Or(a=isAInstruction, b=destAFromC,
+       out=loadA);
+
+    Mux16(a=instruction, b=outALU,
+          sel=instruction[15], out=aInput);
+
+    ARegister(in=aInput, load=loadA,
+              out=aReg, out[0..14]=addressM);
+
+    // D REGISTER
+    And(a=instruction[15], b=instruction[4],
+        out=loadD);
+
+    DRegister(in=outALU, load=loadD, out=outD);
+
+    // ALU INPUT SELECTION
+    Mux16(a=aReg, b=inM,
+          sel=instruction[12], out=aluY);
+
+    // ALU
+    ALU(x=outD, y=aluY,
+        zx=instruction[11],
+        nx=instruction[10],
+        zy=instruction[9],
+        ny=instruction[8],
+        f=instruction[7],
+        no=instruction[6],
+        out=outM, out=outALU,
+        zr=zr, ng=ng);
+
+    // MEMORY WRITE
+    And(a=instruction[15], b=instruction[3],
+        out=writeM);
+
+    // JUMP CONDITIONS
+    Not(in=zr, out=notZr);
+    Not(in=ng, out=notNg);
+
+    And(a=notZr, b=notNg, out=isPositive);
+
+    And(a=instruction[0], b=isPositive,
+        out=takeJGT);
+
+    And(a=instruction[1], b=zr,
+        out=takeJEQ);
+
+    And(a=instruction[2], b=ng,
+        out=takeJLT);
+
+    Or(a=takeJGT, b=takeJEQ, out=jumpPart);
+    Or(a=jumpPart, b=takeJLT, out=validJump);
+
+    And(a=instruction[15], b=validJump,
+        out=loadPC);
+
+    // PROGRAM COUNTER
+    PC(in=aReg, load=loadPC, inc=true,
+       reset=reset, out[0..14]=pc);
+}

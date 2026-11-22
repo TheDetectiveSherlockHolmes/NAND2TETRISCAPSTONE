@@ -1,0 +1,37 @@
+
+ // KRMU Nand2Tetris Capstone - Hack Memory
+ // Implements RAM, Screen and Keyboard memory mapping.
+
+CHIP Memory {
+    IN in[16], load, address[15];
+    OUT out[16];
+
+    PARTS:
+
+    // Decode RAM versus memory-mapped I/O.
+    DMux(in=load, sel=address[14],
+         a=loadRAM, b=loadIO);
+
+    // Decode Screen versus Keyboard.
+    DMux(in=loadIO, sel=address[13],
+         a=loadScreen, b=loadKeyboard);
+
+    // RAM: addresses 0x0000 - 0x3FFF.
+    RAM16K(in=in, load=loadRAM,
+           address=address[0..13], out=ramOut);
+
+    // Screen: addresses 0x4000 - 0x5FFF.
+    Screen(in=in, load=loadScreen,
+           address=address[0..12], out=screenOut);
+
+    // Keyboard: address 0x6000.
+    Keyboard(out=keyboardOut);
+
+    // Select Screen or Keyboard.
+    Mux16(a=screenOut, b=keyboardOut,
+         sel=address[13], out=ioOut);
+
+    // Select RAM or memory-mapped I/O.
+    Mux16(a=ramOut, b=ioOut,
+         sel=address[14], out=out);
+}

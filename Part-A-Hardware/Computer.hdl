@@ -1,0 +1,31 @@
+
+ // KRMU Nand2Tetris Capstone - Hack Computer
+ // Integrates CPU, Memory and ROM32K.
+
+CHIP Computer {
+    IN reset;
+
+    PARTS:
+
+    // Instruction memory
+    ROM32K(address=pc, out=instruction);
+
+    // Central Processing Unit
+    CPU(
+        inM=memOut,
+        instruction=instruction,
+        reset=reset,
+        outM=outM,
+        writeM=writeM,
+        addressM=addressM,
+        pc=pc
+    );
+
+    // Data memory
+    Memory(
+        in=outM,
+        load=writeM,
+        address=addressM,
+        out=memOut
+    );
+}
