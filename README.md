@@ -82,12 +82,3 @@ with an invalid instruction in the file. Expected: a message such as
 The program continuously redraws the 20 screen words. Each row is 32 words apart.
 The first word is SCREEN + 32×76 = 18816; the final word is row 95.
 
-## Submission checklist
-- [ ] GitHub repository contains a `capstone/` folder with HDL, assembler.py,
-      Box.asm and Box.hack.
-- [ ] Official Part A test screenshots are genuine successful simulator outputs.
-- [ ] Official Add, Max, Rect and Pong comparisons are completed.
-- [ ] CPU Emulator screenshot shows the box while a key is held.
-- [ ] Report contains name, roll number, K, dimensions, screenshots and a
-      truthful paragraph about a mistake fixed.
-- [ ] You can explain the code and make a small live change in the viva.
